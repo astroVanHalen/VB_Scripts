@@ -1,0 +1,26 @@
+Sub CollectSheetDataToSOXLeadSheet()
+    Dim wsMain As Worksheet
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    Dim i As Long
+    Dim nextRow As Long
+
+    Set wsMain = ThisWorkbook.Sheets("SOX Lead Sheet") ' change what is inside the quotes to the main sheet name
+    nextRow = 6 ' Start at row 6 in column B
+
+    For Each ws In ThisWorkbook.Sheets										' this loops through sheets and if something is in the A column,
+        If ws.Index > wsMain.Index Then										' the values in that row for column A and B are copied over to the main sheet
+            lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row			' along with the name of the tab
+            For i = 1 To lastRow
+                If Trim(ws.Cells(i, 1).Value) <> "" Then
+                    wsMain.Cells(nextRow, 2).Value = ws.Cells(i, 1).Value 	' Column B: Number from A column
+                    wsMain.Cells(nextRow, 3).Value = ws.Cells(i, 2).Value	' Column C: Description from B column
+                    wsMain.Cells(nextRow, 4).Value = ws.Name              	' Column D: Sheet name from tab the info was pulled
+                    nextRow = nextRow + 1
+                End If
+            Next i
+        End If
+    Next ws
+
+    MsgBox "EZ GG", vbInformation 'message that shows after complete, change to whatever
+End Sub

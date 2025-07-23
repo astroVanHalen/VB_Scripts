@@ -1,0 +1,28 @@
+' resizes an image.  useful if added images to TOD's and TOE's and you
+' want consistency.  I add this to a keybind (CTRL+y) then include it
+' in a macro that will paste, resize, cut, and paste > this makes sure
+' it is resized and the top left of the image is in the top left of a cell
+
+Sub ResizeImageHeightOnly()
+    Dim shp As Shape
+    On Error Resume Next
+    Set shp = Selection.ShapeRange(1)
+    On Error GoTo 0
+
+    If shp Is Nothing Then
+        MsgBox "Select an image before running.", vbExclamation 'error message, can be customized
+        Exit Sub
+    End If
+
+    ' Set target height in inches
+    Const targetHeightInches As Double = 5.7					' customize this for the size image you want throughout	
+    Const pointsPerInch As Double = 72							' I will size an image manually, then check the height and
+    Dim targetHeightPoints As Double							' use that here.  Width id determined dynamically 
+    targetHeightPoints = targetHeightInches * pointsPerInch
+
+    ' Locks aspect ratio so the image isn't skewed
+    shp.LockAspectRatio = msoTrue
+
+    ' Set height only; width adjusts automatically
+    shp.Height = targetHeightPoints
+End Sub

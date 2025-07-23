@@ -1,0 +1,73 @@
+' I add to a keybind (CTRL+G)
+
+' group boxes and images
+Sub GroupPicturesWithRectangles()
+    Dim ws As Worksheet
+    Dim shpPic As Shape, shpBox As Shape
+    Dim shpGroup As Collection
+    Dim i As Long
+    Dim shpArray() As Variant
+    Dim alreadyGrouped As Collection
+
+    Set ws = ActiveSheet
+    Set alreadyGrouped = New Collection
+
+    ' loop through all shapes to find pictures
+    For Each shpPic In ws.Shapes
+        If Left(shpPic.Name, 7) = "Picture" Then
+            
+            Set shpGroup = New Collection
+            shpGroup.Add shpPic
+            
+            ' Check for overlapping rectangles
+            For Each shpBox In ws.Shapes
+                If shpBox.Name <> shpPic.Name Then
+                    If Left(shpBox.Name, 9) = "Rectangle" Then
+                        If Not IsInCollection(alreadyGrouped, shpBox.Name) Then
+                            If ShapesOverlap(shpPic, shpBox) Then
+                                shpGroup.Add shpBox
+                                alreadyGrouped.Add shpBox.Name
+                            End If
+                        End If
+                    End If
+                End If
+            Next shpBox
+            
+            ' Group if we found at least one rectangle
+            If shpGroup.Count > 1 Then
+                ReDim shpArray(1 To shpGroup.Count)
+                For i = 1 To shpGroup.Count
+                    shpArray(i) = shpGroup(i).Name
+                Next i
+                ws.Shapes.Range(shpArray).Group
+            End If
+        End If
+    Next shpPic
+
+    MsgBox "Grouping complete.", vbInformation	'message can be customized
+End Sub
+
+Function ShapesOverlap(s1 As Shape, s2 As Shape) As Boolean
+    Dim l1 As Single, t1 As Single, r1 As Single, b1 As Single
+    Dim l2 As Single, t2 As Single, r2 As Single, b2 As Single
+
+    l1 = s1.Left: t1 = s1.Top
+    r1 = s1.Left + s1.Width: b1 = s1.Top + s1.Height
+
+    l2 = s2.Left: t2 = s2.Top
+    r2 = s2.Left + s2.Width: b2 = s2.Top + s2.Height
+
+    ShapesOverlap = Not (r1 < l2 Or r2 < l1 Or b1 < t2 Or b2 < t1)
+End Function
+
+Function IsInCollection(col As Collection, key As String) As Boolean
+    On Error Resume Next
+    Dim dummy As Variant
+    dummy = col(key)
+    IsInCollection = (Err.Number = 0)
+    Err.Clear
+End Function
+
+
+
+

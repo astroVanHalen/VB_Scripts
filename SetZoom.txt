@@ -1,0 +1,27 @@
+Sub SetZoomAndResetView()
+    Dim ws As Worksheet
+    Dim zoomLevel As Variant
+
+    ' prompt for zoom level
+    zoomLevel = InputBox("Zoom level? (numeric, 10-400):", "Set Zoom Level")
+
+    ' always always always error check
+    If Not IsNumeric(zoomLevel) Or zoomLevel < 10 Or zoomLevel > 400 Then
+        MsgBox "Ah, ah ,ah.  I said between 10 and 400", vbExclamation
+        Exit Sub
+    End If
+
+    ' set that new zoom and move focus to A1 (change A1 to whatever cell you want highlighted)
+    For Each ws In ThisWorkbook.Worksheets
+        With ws
+            .Activate
+            .Range("A1").Select
+            ActiveWindow.Zoom = CLng(zoomLevel)
+        End With
+    Next ws
+    
+    ' sets the first sheet as active
+    Worksheets(1).Activate
+	' message displayed after complete.  customize or comment out for a silent run
+    MsgBox "Zoom level set to " & zoomLevel & "% and view reset to cell A1 on all sheets.", vbInformation
+End Sub
