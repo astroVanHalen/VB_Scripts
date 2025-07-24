@@ -1,10 +1,11 @@
-' Purpose: This macro was made to automate grouping together the boxes and lines drawn on an image
-'	so if the image is moved or resized, the shapes move and resize accordingly
-' Usage: I set a keybind and run this every so often, making sure items are grouped
-' Notes: This groups shapes that overlap pictures by iterating through all object in
-'	sheet.  Use this on each sheet you have, as it doesn't iterate through the workbook
-
-
+' Macro Name: GroupPicturesWithRectangles
+' Author: astroVanHalen
+' Created: 07/24/2025
+' Modified: N/A
+' Purpose: Groups each picture with overlapping rectangles on the active sheet and optionally converts groups to picture format for future cell placement
+' Usage: Select a sheet with pictures and rectangles, then run via Macros menu or set a keybind; answer prompt to convert groups to pictures
+' Notes: Pictures must be named starting with "Picture"; rectangles with "Rectangle"; converted pictures can be placed in cells later.
+'
 Sub GroupPicturesWithRectangles()
     Dim ws As Worksheet
     Dim shpPic As Shape, shpBox As Shape
@@ -12,58 +13,82 @@ Sub GroupPicturesWithRectangles()
     Dim i As Long
     Dim shpArray() As Variant
     Dim alreadyGrouped As Collection
-
+    Dim convertToPicture As VbMsgBoxResult
+    Dim groupedShape As Shape
+    
     Set ws = ActiveSheet
+    If ws.Shapes.Count = 0 Then
+        MsgBox "No shapes found on the active sheet.", vbExclamation
+        Exit Sub
+    End If
+    
+    ' Prompt user to convert groups to picture format
+    convertToPicture = MsgBox("Convert grouped shapes to picture format for future cell placement?", vbYesNo + vbQuestion, "Convert to Picture")
+    
     Set alreadyGrouped = New Collection
-
-    ' loop through all shapes to find pictures
+    Application.ScreenUpdating = False ' Improve performance
+    
+    ' Loop through shapes to find pictures
     For Each shpPic In ws.Shapes
         If Left(shpPic.Name, 7) = "Picture" Then
-            
             Set shpGroup = New Collection
             shpGroup.Add shpPic
             
             ' Check for overlapping rectangles
             For Each shpBox In ws.Shapes
-                If shpBox.Name <> shpPic.Name Then
-                    If Left(shpBox.Name, 9) = "Rectangle" Then
-                        If Not IsInCollection(alreadyGrouped, shpBox.Name) Then
-                            If ShapesOverlap(shpPic, shpBox) Then
-                                shpGroup.Add shpBox
-                                alreadyGrouped.Add shpBox.Name
-                            End If
+                If shpBox.Name <> shpPic.Name And Left(shpBox.Name, 9) = "Rectangle" Then
+                    If Not IsInCollection(alreadyGrouped, shpBox.Name) Then
+                        If ShapesOverlap(shpPic, shpBox) Then
+                            shpGroup.Add shpBox
+                            alreadyGrouped.Add shpBox.Name, shpBox.Name
                         End If
                     End If
                 End If
             Next shpBox
             
-            ' Group if we found at least one rectangle
+            ' Group if at least one rectangle is found
             If shpGroup.Count > 1 Then
                 ReDim shpArray(1 To shpGroup.Count)
                 For i = 1 To shpGroup.Count
                     shpArray(i) = shpGroup(i).Name
                 Next i
-                ws.Shapes.Range(shpArray).Group
+                Set groupedShape = ws.Shapes.Range(shpArray).Group
+                If convertToPicture = vbYes Then
+                    ' Convert group to picture
+                    groupedShape.Copy
+                    ws.Paste
+                    Set groupedShape = ws.Shapes(ws.Shapes.Count) ' Newly pasted picture
+                    groupedShape.Name = "GroupedPicture_" & ws.Shapes.Count
+                End If
             End If
         End If
     Next shpPic
-
-    MsgBox "Grouping complete.", vbInformation	'message can be customized
+    
+    Application.ScreenUpdating = True
+    MsgBox "Pictures and rectangles grouped" & IIf(convertToPicture = vbYes, " and converted to pictures.", "."), vbInformation
 End Sub
 
+' Function: ShapesOverlap
+' Purpose: Checks if two shapes overlap based on their bounding boxes
+' Usage: Called by GroupPicturesWithRectangles to determine overlapping shapes
+'
 Function ShapesOverlap(s1 As Shape, s2 As Shape) As Boolean
     Dim l1 As Single, t1 As Single, r1 As Single, b1 As Single
     Dim l2 As Single, t2 As Single, r2 As Single, b2 As Single
-
+    
     l1 = s1.Left: t1 = s1.Top
     r1 = s1.Left + s1.Width: b1 = s1.Top + s1.Height
-
+    
     l2 = s2.Left: t2 = s2.Top
     r2 = s2.Left + s2.Width: b2 = s2.Top + s2.Height
-
+    
     ShapesOverlap = Not (r1 < l2 Or r2 < l1 Or b1 < t2 Or b2 < t1)
 End Function
 
+' Function: IsInCollection
+' Purpose: Checks if a key exists in a collection to avoid duplicate grouping
+' Usage: Called by GroupPicturesWithRectangles to track grouped rectangles
+'
 Function IsInCollection(col As Collection, key As String) As Boolean
     On Error Resume Next
     Dim dummy As Variant
@@ -71,7 +96,3 @@ Function IsInCollection(col As Collection, key As String) As Boolean
     IsInCollection = (Err.Number = 0)
     Err.Clear
 End Function
-
-
-
-
