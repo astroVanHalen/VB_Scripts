@@ -1,33 +1,45 @@
-' Purpose: This macro was created to loop through the sheets of a TOD and pull information into a table on
-' 	the leadsheet, given certain criteria.  This may not be as relevant to most projects, but it serves
-'	as a good example of the use of macros to automate a process
-' Usage: Run once TOD is complete to populate a table on main sheet
-' Notes: Customizable, but has a niche use case, pending the format of the Leadsheet
-
-
+' Macro Name: CollectSheetDataToSOXLeadSheet
+' Author: astroVanHalen
+' Created: 07/24/2025
+' Modified: N/A
+' Purpose: Loops through sheets (except SOX Lead Sheet) in the active workbook, copies data from columns A and B where A is non-empty, and populates a table on SOX Lead Sheet starting at row 6, columns B-D
+' Usage: Run from any workbook with a SOX Lead Sheet; ensure the main sheet is named correctly
+' Notes: Customizable for specific sheet names and table formats; assumes data starts in column A
+'
 Sub CollectSheetDataToSOXLeadSheet()
     Dim wsMain As Worksheet
     Dim ws As Worksheet
     Dim lastRow As Long
     Dim i As Long
     Dim nextRow As Long
-
-    Set wsMain = ThisWorkbook.Sheets("SOX Lead Sheet") ' change what is inside the quotes to the main sheet name
+    
+    ' Set main sheet; update name if different
+    On Error Resume Next
+    Set wsMain = ActiveWorkbook.Sheets("SOX Lead Sheet")
+    On Error GoTo 0
+    If wsMain Is Nothing Then
+        MsgBox "SOX Lead Sheet not found in the active workbook.", vbExclamation
+        Exit Sub
+    End If
+    
     nextRow = 6 ' Start at row 6 in column B
-
-    For Each ws In ThisWorkbook.Sheets										' this loops through sheets and if something is in the A column,
-        If ws.Index > wsMain.Index Then										' the values in that row for column A and B are copied over to the main sheet
-            lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row			' along with the name of the tab
+    
+    ' Loop through sheets, excluding the main sheet
+    Application.ScreenUpdating = False
+    For Each ws In ActiveWorkbook.Worksheets
+        If ws.Index > wsMain.Index Then
+            lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
             For i = 1 To lastRow
                 If Trim(ws.Cells(i, 1).Value) <> "" Then
-                    wsMain.Cells(nextRow, 2).Value = ws.Cells(i, 1).Value 	' Column B: Number from A column
-                    wsMain.Cells(nextRow, 3).Value = ws.Cells(i, 2).Value	' Column C: Description from B column
-                    wsMain.Cells(nextRow, 4).Value = ws.Name              	' Column D: Sheet name from tab the info was pulled
+                    wsMain.Cells(nextRow, 2).Value = ws.Cells(i, 1).Value ' Column B: Number
+                    wsMain.Cells(nextRow, 3).Value = ws.Cells(i, 2).Value ' Column C: Description
+                    wsMain.Cells(nextRow, 4).Value = ws.Name             ' Column D: Sheet name
                     nextRow = nextRow + 1
                 End If
             Next i
         End If
     Next ws
-
-    MsgBox "EZ GG", vbInformation 'message that shows after complete, change to whatever
+    Application.ScreenUpdating = True
+    
+    MsgBox "Data collection complete.", vbInformation
 End Sub
