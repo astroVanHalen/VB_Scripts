@@ -1,7 +1,7 @@
-' resizes an image.  useful if added images to TOD's and TOE's and you
-' want consistency.  I add this to a keybind (CTRL+y) then include it
-' in a macro that will paste, resize, cut, and paste > this makes sure
-' it is resized and the top left of the image is in the top left of a cell
+' resizes an image.  useful if added images to TOD's and TOE's and you want consistency.  I add this to a keybind (CTRL+y) then include it
+' in a macro that will paste, resize, cut, and paste > this makes sure it is resized and the top left of the image is in the top left of a cell
+'
+'  For instructions on how I use this, see ResizerUseCase.md
 
 Sub ResizeImageHeightOnly()
     Dim shp As Shape
