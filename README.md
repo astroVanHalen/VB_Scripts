@@ -1,97 +1,96 @@
 # Excel VBA Scripts Collection
 
-Welcome to my collection of VBA (Visual Basic for Applications) scripts for Microsoft Excel! These scripts, also called macros, are small programs that automate tasks in Excel, like formatting data, creating charts, or performing calculations. This guide explains how to add these scripts to your Excel so you can use them in any workbook, and how to run them easily using keyboard shortcuts (keybinds) or Excel's macro menu.
+Welcome to my collection of VBA (Visual Basic for Applications) scripts for Microsoft Excel! These scripts, also called macros, are small programs that automate tasks in Excel, like formatting data, creating charts, or performing calculations. This guide explains how to copy these scripts from GitHub and paste them into your Excel so you can use them in any workbook. You’ll also learn how to run them using a menu or keyboard shortcuts (keybinds). No programming experience is needed!
 
 ## What You Need
 - Microsoft Excel (any recent version, like Excel 2016, 2019, 2021, or 365).
 - A computer with Excel installed (Windows or Mac).
-- No programming experience is required—just follow the steps below!
+- A web browser to access GitHub.
 
-## Step 1: Download the VBA Scripts
-1. **Visit the Repository**: You’re already here on the GitHub page!
-2. **Download the Files**:
-   - Click the green **Code** button at the top of this page.
-   - Select **Download ZIP** to get all the scripts.
-   - Unzip the downloaded file to a folder on your computer (e.g., your Desktop or Documents).
-3. **Locate the Scripts**: The folder will contain `.bas` or `.txt` files with the VBA code. These are the scripts you’ll add to Excel.
+## Step 1: Copy the VBA Scripts from GitHub
+1. **Visit the Repository**:
+   - Go to [https://github.com/astroVanHalen/VB_Scripts](https://github.com/astroVanHalen/VB_Scripts).
+2. **Find a Script**:
+   - Click on a script file (e.g., `CollectFromSheets.txt`, `GroupImageShape.txt`, `Resizer.txt`, or `SetZoom.txt`) to view its code.
+3. **Copy the Code**:
+   - Click the **Copy** button (clipboard icon next to 'Raw') above the code to copy the entire script to your clipboard.
+   - Alternatively, click **Raw** to see the code in plain text, select all (**Ctrl + A** or **Cmd + A**), and copy (**Ctrl + C** or **Cmd + C**).
+   - Repeat for each script you want to use.
 
-## Step 2: Add Scripts to Your Personal Macro Workbook
-The Personal Macro Workbook (`PERSONAL.XLSB`) is a special file in Excel that stores macros so they’re available in all your workbooks. Here’s how to add the scripts to it:
+## Step 2: Paste Scripts into Your Personal Macro Workbook
+The Personal Macro Workbook (`PERSONAL.XLSB`) is a special file in Excel that stores macros so they’re available in all your workbooks. Here’s how to paste the scripts into it:
 
 1. **Open Excel**:
    - Start Excel on your computer.
-2. **Enable the Developer Tab** (if not already visible):
+2. **Enable the Developer Tab** (if not visible):
    - Go to **File** > **Options** > **Customize Ribbon**.
    - Check the box for **Developer** in the right-hand list, then click **OK**.
-   - You should now see a **Developer** tab on the Excel ribbon.
+   - You should see a **Developer** tab on the Excel ribbon.
 3. **Open the VBA Editor**:
    - Click the **Developer** tab, then click **Visual Basic** (or press **Alt + F11**).
    - This opens the VBA Editor window.
 4. **Find or Create the Personal Macro Workbook**:
    - In the VBA Editor, look at the **Project Explorer** (left side). If you don’t see it, go to **View** > **Project Explorer**.
-   - Look for a project called `PERSONAL.XLSB`. If it’s not there, you need to create it:
+   - Look for `PERSONAL.XLSB`. If it’s not there, create it:
      - Go back to Excel, click **Developer** > **Record Macro**.
-     - In the dialog box, set "Store macro in" to **Personal Macro Workbook**.
-     - Do any small action (e.g., type “test” in a cell), then click **Stop Recording** (in the Developer tab).
-     - Return to the VBA Editor (**Alt + F11**), and you should now see `PERSONAL.XLSB` in the Project Explorer.
-5. **Import the Scripts**:
-   - In the VBA Editor, right-click on `PERSONAL.XLSB` in the Project Explorer.
+     - Set "Store macro in" to **Personal Macro Workbook**.
+     - Do a small action (e.g., type “test” in a cell), then click **Stop Recording** (in the Developer tab).
+     - Return to the VBA Editor (**Alt + F11**), and you should see `PERSONAL.XLSB`.
+5. **Paste the Script**:
+   - In the VBA Editor, right-click `PERSONAL.XLSB` in the Project Explorer.
    - Choose **Insert** > **Module** to create a new module (e.g., `Module1`).
-   - To import a script:
-     - Right-click the new module, select **File** > **Import File**, and browse to one of the `.bas` or `.txt` files you downloaded.
-     - Repeat for each script you want to add.
-   - Alternatively, you can open a script file in a text editor (like Notepad), copy the code, and paste it into a new module in the VBA Editor.
+   - Double-click the new module to open its code window (right side).
+   - Paste the copied code (**Ctrl + V** or **Cmd + V**) into the code window.
+   - Repeat for each script, creating a new module for each if you prefer (or paste multiple scripts into one module).
 6. **Save the Personal Macro Workbook**:
    - In the VBA Editor, press **Ctrl + S** or go to **File** > **Save PERSONAL.XLSB**.
    - Close the VBA Editor.
-   - In Excel, save and close any open workbooks. Excel will ask if you want to save changes to `PERSONAL.XLSB`—click **Yes**.
+   - In Excel, save and close any open workbooks. If prompted to save `PERSONAL.XLSB`, click **Yes**.
 
-Now the scripts are stored in your Personal Macro Workbook and available in all Excel workbooks on your computer!
+Your scripts are now stored in `PERSONAL.XLSB` and available in all Excel workbooks on your computer!
 
 ## Step 3: Run the Macros
-You can run the macros in two ways: using the macro dialog or by setting up keyboard shortcuts (keybinds).
+You can run the macros in two ways: using the macro menu or by setting keyboard shortcuts.
 
-### Option 1: Use the Macro Dialog
+### Option 1: Use the Macro Menu
 1. Open any Excel workbook.
 2. Go to the **Developer** tab and click **Macros** (or press **Alt + F8**).
 3. In the dialog box, you’ll see a list of macros (e.g., `PERSONAL.XLSB!MacroName`).
-4. Select the macro you want to run and click **Run**.
+4. Select a macro and click **Run**.
 5. The macro will perform its task on the active workbook or sheet.
 
 ### Option 2: Set Up Keyboard Shortcuts (Keybinds)
-Keybinds let you run a macro by pressing a combination of keys (e.g., Ctrl + Shift + M). Here’s how to set them up:
+Keybinds let you run a macro by pressing keys (e.g., Ctrl + Shift + M). Here’s how:
 1. Go to the **Developer** tab and click **Macros** (or press **Alt + F8**).
-2. Select a macro from the list (e.g., `PERSONAL.XLSB!MacroName`).
+2. Select a macro (e.g., `PERSONAL.XLSB!MacroName`).
 3. Click **Options**.
 4. In the **Shortcut key** field, type a letter (e.g., `M`).
-   - You can choose **Ctrl + [Letter]** or **Ctrl + Shift + [Letter]**.
-   - Example: Typing `M` creates **Ctrl + M**; typing `Shift + M` creates **Ctrl + Shift + M**.
-   - Avoid using common Excel shortcuts like **Ctrl + C** or **Ctrl + V**.
+   - Choose **Ctrl + [Letter]** or **Ctrl + Shift + [Letter]** (e.g., `Shift + M` for **Ctrl + Shift + M**).
+   - Avoid common Excel shortcuts like **Ctrl + C** or **Ctrl + V**.
 5. Click **OK**, then close the dialog.
-6. Repeat for other macros, using different letters for each.
-7. To run a macro, press its keybind (e.g., **Ctrl + Shift + M**) in any Excel workbook.
+6. Repeat for other macros, using different letters.
+7. Run a macro by pressing its keybind (e.g., **Ctrl + Shift + M**).
 
 ## Tips
-- **Enable Macros**: When opening a workbook, Excel may ask you to enable macros. Click **Enable Content** to use your macros.
-- **Check Macro Descriptions**: Each script file in this repository includes a comment at the top explaining what it does. Open the `.bas` or `.txt` file in a text editor to read it.
-- **Backup Your Work**: Before running a macro on an important workbook, save a copy of your file in case something goes wrong.
+- **Enable Macros**: When opening a workbook, Excel may ask to enable macros. Click **Enable Content** to use your macros.
+- **Check Macro Descriptions**: Each script file on GitHub has a comment at the top explaining what it does. Read it in the GitHub browser before copying.
+- **Backup Your Work**: Before running a macro on an important workbook, save a copy of your file.
 - **Troubleshooting**:
-   - If a macro doesn’t appear in the dialog, ensure it’s in `PERSONAL.XLSB` and that you saved the Personal Macro Workbook.
-   - If a macro doesn’t work as expected, check the script’s description for any specific instructions (e.g., it may need to be run on a specific sheet or with data in a certain format).
-- **Sharing**: These macros are stored in your `PERSONAL.XLSB`, which stays on your computer. To share them, share the `.bas` files or this repository with others, and have them follow these steps.
+   - If a macro doesn’t appear in the menu, ensure it’s in `PERSONAL.XLSB` and you saved it.
+   - If a macro doesn’t work, check its description on GitHub for specific instructions (e.g., it may need a certain sheet or data format).
+- **Sharing**: To share macros, share the GitHub repository link (`https://github.com/astroVanHalen/VB_Scripts`) so others can copy the code.
 
 ## Example Macro
-Here’s an example of what one of the scripts might do:
 - **Macro Name**: `ActivateFirstSheet`
 - **Description**: Sets the first worksheet in your workbook as the active sheet.
-- **How to Use**: Run it via the macro dialog or assign a keybind like **Ctrl + Shift + F**.
+- **How to Use**: Run it via the macro menu or assign a keybind like **Ctrl + Shift + F**.
 
 ## Contributing
-If you have ideas for new macros or improvements, feel free to:
+Have ideas for new macros or improvements? Feel free to:
 - Open an **Issue** on this GitHub repository to suggest changes.
-- Submit a **Pull Request** with new `.bas` files or updates to existing scripts.
+- Submit a **Pull Request** with new scripts or updates.
 
 ## Contact
-If you need help or have questions, open an issue on this GitHub repository, and I’ll do my best to assist!
+For help or questions, open an issue on this GitHub repository, and I’ll assist!
 
 Happy automating with Excel!
