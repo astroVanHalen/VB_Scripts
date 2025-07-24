@@ -1,3 +1,10 @@
+' Purpose: This macro will reset the zoom to a specified value and move the focus to cell A1
+'	for each sheet in a workbook then reset the active sheet to the first sheet in the book
+' Usage: Use this once a document is complete to tidy up and give a more professional experience
+' Notes: When this macro is run, the user is prompted for a zoom level.  I typically use 85 if
+'	there are sheets with screenshots, 100 otherwise
+
+
 Sub SetZoomAndResetView()
     Dim ws As Worksheet
     Dim zoomLevel As Variant

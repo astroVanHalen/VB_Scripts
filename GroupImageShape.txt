@@ -1,6 +1,10 @@
-' I add to a keybind (CTRL+G)
+' Purpose: This macro was made to automate grouping together the boxes and lines drawn on an image
+'	so if the image is moved or resized, the shapes move and resize accordingly
+' Usage: I set a keybind and run this every so often, making sure items are grouped
+' Notes: This groups shapes that overlap pictures by iterating through all object in
+'	sheet.  Use this on each sheet you have, as it doesn't iterate through the workbook
 
-' group boxes and images
+
 Sub GroupPicturesWithRectangles()
     Dim ws As Worksheet
     Dim shpPic As Shape, shpBox As Shape

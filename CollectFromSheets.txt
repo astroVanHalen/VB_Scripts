@@ -1,3 +1,10 @@
+' Purpose: This macro was created to loop through the sheets of a TOD and pull information into a table on
+' 	the leadsheet, given certain criteria.  This may not be as relevant to most projects, but it serves
+'	as a good example of the use of macros to automate a process
+' Usage: Run once TOD is complete to populate a table on main sheet
+' Notes: Customizable, but has a niche use case, pending the format of the Leadsheet
+
+
 Sub CollectSheetDataToSOXLeadSheet()
     Dim wsMain As Worksheet
     Dim ws As Worksheet
