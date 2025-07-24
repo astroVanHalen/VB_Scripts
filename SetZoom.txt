@@ -1,34 +1,34 @@
-' Purpose: This macro will reset the zoom to a specified value and move the focus to cell A1
-'	for each sheet in a workbook then reset the active sheet to the first sheet in the book
-' Usage: Use this once a document is complete to tidy up and give a more professional experience
-' Notes: When this macro is run, the user is prompted for a zoom level.  I typically use 85 if
-'	there are sheets with screenshots, 100 otherwise
-
-
+' Macro Name: SetZoomAndResetView
+' Author: astroVanHalen
+' Created: 07/24/2025
+' Modified: N/A
+' Purpose: Prompts user for a zoom level (10-400), sets all sheets in the active workbook to that zoom, selects cell A1 on each sheet, and activates the first sheet
+' Usage: Run via Ctrl + Z or Macros menu from any workbook; no specific selection required
+' Notes: Validates zoom input; works from PERSONAL.XLSB or any workbook
+'
 Sub SetZoomAndResetView()
     Dim ws As Worksheet
     Dim zoomLevel As Variant
-
-    ' prompt for zoom level
+    
+    ' Prompt for zoom level
     zoomLevel = InputBox("Zoom level? (numeric, 10-400):", "Set Zoom Level")
-
-    ' always always always error check
+    
+    ' Check for valid input or cancellation
+    If zoomLevel = "" Then Exit Sub ' Exit if user cancels
     If Not IsNumeric(zoomLevel) Or zoomLevel < 10 Or zoomLevel > 400 Then
-        MsgBox "Ah, ah ,ah.  I said between 10 and 400", vbExclamation
+        MsgBox "Please enter a number between 10 and 400.", vbExclamation
         Exit Sub
     End If
-
-    ' set that new zoom and move focus to A1 (change A1 to whatever cell you want highlighted)
-    For Each ws In ThisWorkbook.Worksheets
-        With ws
-            .Activate
-            .Range("A1").Select
-            ActiveWindow.Zoom = CLng(zoomLevel)
-        End With
-    Next ws
     
-    ' sets the first sheet as active
-    Worksheets(1).Activate
-	' message displayed after complete.  customize or comment out for a silent run
+    ' Set zoom, select A1, and activate first sheet
+    Application.ScreenUpdating = False ' Improve performance
+    For Each ws In ActiveWorkbook.Worksheets
+        ws.Activate
+        ws.Range("A1").Select
+        ActiveWindow.Zoom = CLng(zoomLevel)
+    Next ws
+    ActiveWorkbook.Worksheets(1).Activate
+    
+    Application.ScreenUpdating = True
     MsgBox "Zoom level set to " & zoomLevel & "% and view reset to cell A1 on all sheets.", vbInformation
 End Sub
