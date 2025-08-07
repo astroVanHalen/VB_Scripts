@@ -1,0 +1,21 @@
+' Macro Name: ResizeImageHeightOnly
+' Author: astroVanHalen
+' Created: 08/07/2025
+' Modified: N/A
+' Purpose: Set 'Insert Shape' default properties to: dark red, no fill, 2.25 thickness
+' Usage: Select an image in any workbook, then run via Ctrl + Y or Macros menu
+' Notes: Handy to set default shape in existing workbooks.  Add to keybind for easier access.
+'        This can be used to set the default for new workbooks, but a saving a theme/template
+'        would be more efficient.
+
+Sub SetDefaultShapeFormat()
+    Dim shp As Shape
+    Set shp = ActiveSheet.Shapes.AddShape(msoShapeRectangle, 100, 100, 100, 50)
+    With shp
+        .Fill.Transparency = 1 'No fill
+        .Line.ForeColor.RGB = RGB(128, 0, 0) 'Dark red
+        .Line.Weight = 2.25 '2.25 pt thickness
+        .SetShapesDefaultProperties 'Set as default for this workbook
+    End With
+    shp.Delete 'Optional: delete the temporary shape
+End Sub
