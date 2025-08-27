@@ -1,3 +1,12 @@
+' Macro Name: CreateTextBoxesGruvbox
+' Author: astroVanHalen
+' Created: 08/27/2025
+' Modified: N/A
+' Purpose: Add text boxes formatted for reference flags during testing.
+' Usage: Run the macro.  User will be prompted for how many different boxes are needed and how many copies of each are needed.  These will be pasted in the top left of the sheet.
+' Notes: This will handle up to 13 different flags.  If you want to add more or change color scheme (and have no experience with VBA or RGB values), copy/paste this into CoPilot, Grok, ChatGPT, etc, and ask for the specific change.
+
+
 Sub CreateTextBoxesGruvbox()
     Dim ws As Worksheet
     Dim tb As Shape
