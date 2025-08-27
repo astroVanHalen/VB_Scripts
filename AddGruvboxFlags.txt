@@ -1,0 +1,145 @@
+Sub CreateTextBoxesGruvbox()
+    Dim ws As Worksheet
+    Dim tb As Shape
+    Dim i As Integer
+    Dim j As Integer
+    Dim colors As Variant
+    Dim leftPos As Double
+    Dim topPos As Double
+    Dim boxSize As Double
+    Dim letters As String
+    Dim numBoxes As Integer
+    Dim userInput As String
+    Dim userInput2 As String
+    
+    On Error GoTo ErrorHandler
+    ' Disable screen updating to improve performance
+    Application.ScreenUpdating = False
+    Debug.Print "Starting CreateTextBoxesGruvbox at " & Now
+    
+    ' Verify ActiveWorkbook and ActiveSheet exist
+    If ActiveWorkbook Is Nothing Then
+        MsgBox "No active workbook found. Please open a workbook and try again.", vbCritical
+        Exit Sub
+    End If
+    If ActiveSheet Is Nothing Then
+        MsgBox "No active sheet found. Please select a sheet and try again.", vbCritical
+        Exit Sub
+    End If
+    Set ws = ActiveSheet
+    Debug.Print "Active Workbook: " & ActiveWorkbook.Name
+    Debug.Print "Active Sheet: " & ws.Name
+    
+    ' Prompt user for number of letters (1-13)
+    userInput = InputBox("Enter the number of letters (1-13) to create two text boxes for each:", "Text Box Count", "1")
+    userInput2 = InputBox("How many copies:", "Text Box Count", "1")
+    
+    ' Validate input
+    If userInput = "" Then
+        MsgBox "Operation cancelled by user.", vbInformation
+        Exit Sub
+    End If
+    If userInput2 = "" Then
+        MsgBox "Operation cancelled by user.", vbInformation
+        Exit Sub
+    End If
+    
+    If Not IsNumeric(userInput) Then
+        MsgBox "Please enter a valid number between 1 and 13.", vbCritical
+        Exit Sub
+    End If
+    If Not IsNumeric(userInput2) Then
+        MsgBox "Please enter a valid number.", vbCritical
+        Exit Sub
+    End If
+    
+    numBoxes = CInt(userInput)
+    numBoxes2 = CInt(userInput2)
+    If numBoxes < 1 Or numBoxes > 13 Then
+        MsgBox "Number must be between 1 and 13.", vbCritical
+        Exit Sub
+    End If
+    Debug.Print "User requested " & numBoxes & " letters (" & numBoxes2 & " text boxes each)"
+    
+    ' Define 13 distinguishable Gruvbox dark theme colors (RGB values)
+    colors = Array( _
+        RGB(251, 73, 52), _
+        RGB(184, 187, 38), _
+        RGB(250, 189, 47), _
+        RGB(131, 165, 152), _
+        RGB(211, 134, 155), _
+        RGB(142, 192, 124), _
+        RGB(254, 128, 25), _
+        RGB(146, 131, 116), _
+        RGB(204, 36, 29), _
+        RGB(88, 110, 117), _
+        RGB(157, 192, 139), _
+        RGB(214, 93, 14), _
+        RGB(235, 219, 178) _
+    )
+    
+    ' Define letters A to M
+    letters = "ABCDEFGHIJKLM"
+    
+    ' Set size (0.25 inches = 18 points)
+    boxSize = 18
+    
+    ' Starting position for text boxes (in points)
+    leftPos = 10
+    topPos = 10
+    
+    ' Create two text boxes for each of the specified letters
+    For i = 0 To numBoxes - 1
+        For j = 1 To numBoxes2 ' Create three text boxes for each letter
+            ' Add text box
+            Set tb = ws.Shapes.AddTextbox(msoTextOrientationHorizontal, leftPos, topPos, boxSize, boxSize)
+            Debug.Print "Created text box " & (i * 2 + j) & " for letter " & Mid(letters, i + 1, 1)
+            
+            ' Set text to corresponding letter
+            tb.TextFrame2.TextRange.Text = Mid(letters, i + 1, 1)
+            
+            ' Set font properties
+            With tb.TextFrame2.TextRange.Font
+                .Size = 10
+                .Name = "Tahoma"
+                .Bold = msoTrue
+            End With
+            
+            ' Center text
+            tb.TextFrame2.VerticalAnchor = msoAnchorMiddle
+            tb.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+            
+            ' Set fill color (Gruvbox theme)
+            tb.Fill.ForeColor.RGB = colors(i)
+            
+            ' Set black outline (2.25 points)
+            With tb.Line
+                .Visible = msoTrue
+                .ForeColor.RGB = RGB(0, 0, 0)
+                .Weight = 2.25
+            End With
+            
+            ' Adjust position for next text box
+            leftPos = leftPos + boxSize + 5
+            If (i * 2 + j) Mod 5 = 0 Then
+                leftPos = 10
+                topPos = topPos + boxSize + 5
+            End If
+            
+            ' Brief pause to prevent resource overload
+            DoEvents
+        Next j
+    Next i
+    
+    ' Re-enable screen updating
+    Application.ScreenUpdating = True
+    MsgBox (numBoxes * 2) & " text boxes (two each for letters A-" & Mid(letters, numBoxes, 1) & ") with Gruvbox theme colors created on sheet '" & ws.Name & "'.", vbInformation
+    Debug.Print "Macro completed successfully"
+    Exit Sub
+
+ErrorHandler:
+    Application.ScreenUpdating = True
+    Debug.Print "Error occurred: " & Err.Description
+    MsgBox "An error occurred: " & Err.Description & vbNewLine & "Check the VBA Editor's Immediate Window for details.", vbCritical
+End Sub
+
