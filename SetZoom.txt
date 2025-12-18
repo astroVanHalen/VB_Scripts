@@ -1,34 +1,83 @@
-' Macro Name: SetZoomAndResetView
-' Author: astroVanHalen
-' Created: 07/24/2025
-' Modified: N/A
-' Purpose: Prompts user for a zoom level (10-400), sets all sheets in the active workbook to that zoom, selects cell A1 on each sheet, and activates the first sheet
-' Usage: Run via Ctrl + Z or Macros menu from any workbook; no specific selection required
-' Notes: Validates zoom input; works from PERSONAL.XLSB or any workbook
-'
+
 Sub SetZoomAndResetView()
+    ' Macro Name: SetZoomAndResetView
+    ' Author: astroVanHalen (enhanced by M365 Copilot)
+    ' Created: 07/24/2025 
+    ' Updated: 12/18/2025
+    ' Purpose: Prompts user for a zoom level (10-400), sets all worksheets in the active workbook to that zoom,
+    '          sets focus to A1 on each sheet, and returns focus to the originally active sheet.
+    ' Notes: Validates input; handles chart sheets; safe state toggling; faster screen updating.
+
     Dim ws As Worksheet
+    Dim sht As Object
     Dim zoomLevel As Variant
-    
-    ' Prompt for zoom level
-    zoomLevel = InputBox("Zoom level? (numeric, 10-400):", "Set Zoom Level")
-    
-    ' Check for valid input or cancellation
-    If zoomLevel = "" Then Exit Sub ' Exit if user cancels
-    If Not IsNumeric(zoomLevel) Or zoomLevel < 10 Or zoomLevel > 400 Then
+    Dim originalSheet As Worksheet
+    Dim originalWindowZoom As Long
+    Dim hadError As Boolean
+
+    On Error GoTo CleanFail
+
+    ' Capture original sheet and window zoom
+    If TypeName(ActiveSheet) = "Worksheet" Then
+        Set originalSheet = ActiveSheet
+    Else
+        ' If active is a chartsheet, pick first worksheet if available
+        If ActiveWorkbook.Worksheets.Count > 0 Then
+            Set originalSheet = ActiveWorkbook.Worksheets(1)
+        Else
+            ' No worksheets? Exit gracefully
+            MsgBox "No worksheets found in this workbook.", vbExclamation
+            Exit Sub
+        End If
+    End If
+    originalWindowZoom = ActiveWindow.Zoom
+
+    ' Prompt for zoom level (Enter defaults to 85)
+    zoomLevel = InputBox("Zoom level? (numeric, 10–400). Press Enter for 85:", "Set Zoom Level", "85")
+    If zoomLevel = "" Then Exit Sub
+    If Not IsNumeric(zoomLevel) Then
         MsgBox "Please enter a number between 10 and 400.", vbExclamation
         Exit Sub
     End If
-    
-    ' Set zoom, select A1, and activate first sheet
-    Application.ScreenUpdating = False ' Improve performance
-    For Each ws In ActiveWorkbook.Worksheets
-        ws.Activate
-        ws.Range("A1").Select
-        ActiveWindow.Zoom = CLng(zoomLevel)
-    Next ws
-    ActiveWorkbook.Worksheets(1).Activate
-    
+    zoomLevel = CLng(zoomLevel)
+    If zoomLevel < 10 Or zoomLevel > 400 Then
+        MsgBox "Please enter a number between 10 and 400.", vbExclamation
+        Exit Sub
+    End If
+
+    ' Optimize
+    Application.ScreenUpdating = False
+    Application.EnableEvents = False
+
+    ' Loop through all sheets (worksheets only for A1 focus)
+    For Each sht In ActiveWorkbook.Sheets
+        If TypeName(sht) = "Worksheet" Then
+            Set ws = sht
+            ' Set A1 focus without Select (activate the sheet, then position)
+            ws.Activate
+            ws.Range("A1").Activate
+            ActiveWindow.Zoom = zoomLevel
+        Else
+            ' Chart sheet: you can still set zoom if window is on it
+            sht.Activate
+            ActiveWindow.Zoom = zoomLevel
+        End If
+    Next sht
+
+    ' Return to the original sheet and its zoom (optional: restore zoom)
+    originalSheet.Activate
+    ' Uncomment the next line if you prefer to restore the original zoom on the original sheet
+    ' ActiveWindow.Zoom = originalWindowZoom
+
+    MsgBox "Zoom set to " & zoomLevel & "% and view reset to A1 on all worksheets.", vbInformation
+
+CleanExit:
+    Application.EnableEvents = True
     Application.ScreenUpdating = True
-    MsgBox "Zoom level set to " & zoomLevel & "% and view reset to cell A1 on all sheets.", vbInformation
+    Exit Sub
+
+CleanFail:
+    hadError = True
+    MsgBox "Something went wrong while setting zoom: " & Err.Description, vbExclamation
+    Resume CleanExit
 End Sub
