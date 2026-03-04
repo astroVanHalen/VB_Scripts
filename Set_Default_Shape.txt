@@ -8,14 +8,42 @@
 '        This can be used to set the default for new workbooks, but a saving a theme/template
 '        would be more efficient.
 
-Sub SetDefaultShapeFormat()
-    Dim shp As Shape
-    Set shp = ActiveSheet.Shapes.AddShape(msoShapeRectangle, 100, 100, 100, 50)
-    With shp
-        .Fill.Transparency = 1 'No fill
-        .Line.ForeColor.RGB = RGB(128, 0, 0) 'Dark red
-        .Line.Weight = 2.25 '2.25 pt thickness
-        .SetShapesDefaultProperties 'Set as default for this workbook
+Sub SetDefaultShapeProperties()
+    Dim ws As Worksheet
+    Dim tempShape As Shape
+    Dim tempTextBox As Shape
+    Dim darkRed As Long
+    
+    Set ws = ActiveSheet  ' Apply to active worksheet; defaults are workbook-wide
+    darkRed = RGB(139, 0, 0)  ' Dark red color
+    
+    ' Create and format temporary rectangle for general shape defaults
+    Set tempShape = ws.Shapes.AddShape(msoShapeRectangle, 0, 0, 1, 1)
+    With tempShape
+        .Line.Weight = 2.25  ' 2 1/4 pt line weight
+        .Line.ForeColor.RGB = darkRed  ' Dark red line
+        .Line.Visible = msoTrue  ' Ensure line is visible
+        .Fill.Visible = msoFalse  ' No fill for general default (shapes may vary)
+        .SetShapesDefaultProperties  ' Set as default for all shapes
     End With
-    shp.Delete 'Optional: delete the temporary shape
+    tempShape.Delete  ' Clean up
+    
+    ' Create and format temporary text box for text box defaults
+    Set tempTextBox = ws.Shapes.AddTextbox(msoTextOrientationHorizontal, 0, 0, 1, 1)
+    With tempTextBox
+        .Line.Weight = 2.25  ' 2 1/4 pt line weight
+        .Line.ForeColor.RGB = darkRed  ' Dark red line
+        .Fill.ForeColor.RGB = RGB(255, 255, 255)  ' White fill
+        .TextFrame2.TextRange.Font.Fill.ForeColor.RGB = darkRed  ' Dark red text (optional; adjust if needed)
+        With .TextFrame2.TextRange.Font
+            .NameComplexScript = "Calibri"  ' Font family
+            .NameFarEast = "Calibri"
+            .NameAscii = "Calibri"
+            .Size = 10  ' 10 pt
+        End With
+        .SetShapesDefaultProperties  ' Set as default for text boxes (applies to this type)
+    End With
+    tempTextBox.Delete  ' Clean up
+    
+    ' MsgBox "Default shape and text box properties have been set successfully!"
 End Sub
