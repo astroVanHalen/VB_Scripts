@@ -1,0 +1,74 @@
+Option Explicit
+
+Public Sub PrayersThisWorks()
+    Dim awb As Workbook
+    Dim ws As Worksheet
+    Dim targetName As String
+    Dim msgRange As Range
+    Dim exists As Boolean
+    Dim sh As Worksheet
+    
+    targetName = "IT_WORKS"
+    Set awb = ActiveWorkbook  ' Use the workbook the user is actually working in
+
+    If awb Is Nothing Then
+        MsgBox "No active workbook detected.", vbExclamation
+        Exit Sub
+    End If
+
+    Application.ScreenUpdating = False
+    Application.DisplayAlerts = False
+
+    ' --- Check if the sheet already exists in the ActiveWorkbook
+    exists = False
+    For Each sh In awb.Worksheets
+        If StrComp(sh.Name, targetName, vbTextCompare) = 0 Then
+            exists = True
+            Set ws = sh
+            Exit For
+        End If
+    Next sh
+
+    ' --- If exists, delete it so we truly create a fresh tab
+    If exists Then
+        ws.Delete
+        Set ws = Nothing
+    End If
+
+    ' --- Add a new sheet at the end and bring focus
+    Set ws = awb.Worksheets.Add(After:=awb.Worksheets(awb.Worksheets.count))
+    ws.Name = targetName
+    ws.Activate
+
+    ' --- Define a block and merge (ensures not just the top-left cell shows the text)
+    Set msgRange = ws.Range("B3:F7")
+    With msgRange
+        .Clear
+        .Merge
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .WrapText = True
+        .Interior.Color = RGB(255, 255, 255) ' white
+        .Font.Color = RGB(139, 0, 0)         ' dark red
+        .Font.Bold = True
+        .Font.Size = 16
+
+        ' Outline the merged block with a thick dark red border
+        With .Borders
+            .LineStyle = xlContinuous
+            .Weight = xlThick
+            .Color = RGB(139, 0, 0)
+        End With
+    End With
+
+    ' --- Set the message
+    msgRange.Value = "CONGRATULATIONS, You successfully added and ran a macro!"
+
+    ' Optional: center the view a bit
+    On Error Resume Next
+    ActiveWindow.Zoom = 120
+    On Error GoTo 0
+
+    Application.DisplayAlerts = True
+    Application.ScreenUpdating = True
+End Sub
