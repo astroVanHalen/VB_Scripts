@@ -5,8 +5,7 @@
 ' Purpose: Set 'Insert Shape' default properties to: dark red, no fill, 2.25 thickness
 ' Usage: Select an image in any workbook, then run via Ctrl + Y or Macros menu
 ' Notes: Handy to set default shape in existing workbooks.  Add to keybind for easier access.
-'        This can be used to set the default for new workbooks, but a saving a theme/template
-'        would be more efficient.
+'        This can be used to set the default for new workbooks.
 
 Sub SetDefaultShapeProperties()
     Dim ws As Worksheet
@@ -18,10 +17,11 @@ Sub SetDefaultShapeProperties()
     darkRed = RGB(139, 0, 0)  ' Dark red color
     
     ' Create and format temporary rectangle for general shape defaults
+    ' Adjust values marked with '***' to your/team preference
     Set tempShape = ws.Shapes.AddShape(msoShapeRectangle, 0, 0, 1, 1)
     With tempShape
-        .Line.Weight = 2.25  ' 2 1/4 pt line weight
-        .Line.ForeColor.RGB = darkRed  ' Dark red line
+        .Line.Weight = 2.25  ' 2 1/4 pt line weight ***
+        .Line.ForeColor.RGB = darkRed  ' Dark red line ***
         .Line.Visible = msoTrue  ' Ensure line is visible
         .Fill.Visible = msoFalse  ' No fill for general default (shapes may vary)
         .SetShapesDefaultProperties  ' Set as default for all shapes
@@ -29,17 +29,18 @@ Sub SetDefaultShapeProperties()
     tempShape.Delete  ' Clean up
     
     ' Create and format temporary text box for text box defaults
+    ' Adjust values marked with '***' to your/team preference
     Set tempTextBox = ws.Shapes.AddTextbox(msoTextOrientationHorizontal, 0, 0, 1, 1)
     With tempTextBox
-        .Line.Weight = 2.25  ' 2 1/4 pt line weight
-        .Line.ForeColor.RGB = darkRed  ' Dark red line
-        .Fill.ForeColor.RGB = RGB(255, 255, 255)  ' White fill
-        .TextFrame2.TextRange.Font.Fill.ForeColor.RGB = darkRed  ' Dark red text (optional; adjust if needed)
+        .Line.Weight = 2.25  ' 2 1/4 pt line weight***
+        .Line.ForeColor.RGB = darkRed  ' Dark red line***
+        .Fill.ForeColor.RGB = RGB(255, 255, 255)  ' White fill***
+        .TextFrame2.TextRange.Font.Fill.ForeColor.RGB = darkRed  ' Dark red text (optional; adjust if needed)***
         With .TextFrame2.TextRange.Font
-            .NameComplexScript = "Calibri"  ' Font family
+            .NameComplexScript = "Calibri"  ' Font family***
             .NameFarEast = "Calibri"
             .NameAscii = "Calibri"
-            .Size = 10  ' 10 pt
+            .Size = 10  ' 10 pt***
         End With
         .SetShapesDefaultProperties  ' Set as default for text boxes (applies to this type)
     End With
