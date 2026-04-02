@@ -11,17 +11,21 @@ Sub SetDefaultShapeProperties()
     Dim ws As Worksheet
     Dim tempShape As Shape
     Dim tempTextBox As Shape
-    Dim darkRed As Long
+    Dim newColor As Long
     
     Set ws = ActiveSheet  ' Apply to active worksheet; defaults are workbook-wide
-    darkRed = RGB(139, 0, 0)  ' Dark red color
+' ********************************************
+' If you want to change the color of the box,
+' modify the RGB value below.  For example, standard
+' red would be RGB(255, 0, 0)
+    newColor = RGB(0, 0, 255)  ' Dark red color
     
     ' Create and format temporary rectangle for general shape defaults
     ' Adjust values marked with '***' to your/team preference
     Set tempShape = ws.Shapes.AddShape(msoShapeRectangle, 0, 0, 1, 1)
     With tempShape
         .Line.Weight = 2.25  ' 2 1/4 pt line weight ***
-        .Line.ForeColor.RGB = darkRed  ' Dark red line ***
+        .Line.ForeColor.RGB = newColor  ' Dark red line ***
         .Line.Visible = msoTrue  ' Ensure line is visible
         .Fill.Visible = msoFalse  ' No fill for general default (shapes may vary)
         .SetShapesDefaultProperties  ' Set as default for all shapes
@@ -33,9 +37,9 @@ Sub SetDefaultShapeProperties()
     Set tempTextBox = ws.Shapes.AddTextbox(msoTextOrientationHorizontal, 0, 0, 1, 1)
     With tempTextBox
         .Line.Weight = 2.25  ' 2 1/4 pt line weight***
-        .Line.ForeColor.RGB = darkRed  ' Dark red line***
+        .Line.ForeColor.RGB = newColor  ' Dark red line***
         .Fill.ForeColor.RGB = RGB(255, 255, 255)  ' White fill***
-        .TextFrame2.TextRange.Font.Fill.ForeColor.RGB = darkRed  ' Dark red text (optional; adjust if needed)***
+        .TextFrame2.TextRange.Font.Fill.ForeColor.RGB = newColor  ' Dark red text (optional; adjust if needed)***
         With .TextFrame2.TextRange.Font
             .NameComplexScript = "Calibri"  ' Font family***
             .NameFarEast = "Calibri"
@@ -48,3 +52,4 @@ Sub SetDefaultShapeProperties()
     
     ' MsgBox "Default shape and text box properties have been set successfully!"
 End Sub
+
