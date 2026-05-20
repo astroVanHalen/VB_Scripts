@@ -1,0 +1,212 @@
+Option Explicit
+
+Sub GroupAnnotatedPictures()
+    Dim ws As Worksheet
+    Set ws = ActiveSheet
+
+    Dim pic As Shape, shp As Shape, arr As Shape
+    Dim memberNames As Collection
+    Dim redBoxes As Collection
+    Dim grp As Shape
+    Dim names() As String
+    Dim i As Long
+
+    For Each pic In ws.Shapes
+        If pic.Type = msoPicture Then
+            Set memberNames = New Collection
+            Set redBoxes = New Collection
+            AddUnique memberNames, pic.Name
+
+            ' 1. Red rectangles overlapping this picture
+            For Each shp In ws.Shapes
+                If IsRedRectangle(shp) Then
+                    If ShapesOverlap(shp, pic) Then
+                        redBoxes.Add shp
+                        AddUnique memberNames, shp.Name
+                    End If
+                End If
+            Next shp
+
+            ' 2. For each arrow, figure out which two shapes it links
+            For Each arr In ws.Shapes
+                If IsConnector(arr) Then
+                    Dim shpA As Shape, shpB As Shape
+                    ResolveArrowEnds ws, arr, shpA, shpB
+
+                    Dim hitBox As Shape, other As Shape
+                    Set hitBox = Nothing: Set other = Nothing
+
+                    If Not shpA Is Nothing Then
+                        If IsInCollection(redBoxes, shpA) Then
+                            Set hitBox = shpA: Set other = shpB
+                        End If
+                    End If
+                    If hitBox Is Nothing And Not shpB Is Nothing Then
+                        If IsInCollection(redBoxes, shpB) Then
+                            Set hitBox = shpB: Set other = shpA
+                        End If
+                    End If
+
+                    If Not hitBox Is Nothing Then
+                        AddUnique memberNames, arr.Name
+                        If Not other Is Nothing Then
+                            If other.Type = msoTextBox Then
+                                AddUnique memberNames, other.Name
+                            End If
+                        End If
+                    End If
+                End If
+            Next arr
+
+            If memberNames.count > 1 Then
+                ReDim names(0 To memberNames.count - 1)
+                For i = 1 To memberNames.count
+                    names(i - 1) = memberNames(i)
+                Next i
+                Set grp = ws.Shapes.Range(names).Group
+                grp.Name = "AnnotatedPic_" & pic.Name
+            End If
+        End If
+    Next pic
+End Sub
+
+' --- arrow endpoint resolution: try ConnectorFormat first, then geometry ---
+
+Private Sub ResolveArrowEnds(ws As Worksheet, arr As Shape, _
+                             ByRef shpA As Shape, ByRef shpB As Shape)
+    Set shpA = Nothing: Set shpB = Nothing
+
+    On Error Resume Next
+    If arr.ConnectorFormat.BeginConnected Then _
+        Set shpA = arr.ConnectorFormat.BeginConnectedShape
+    If arr.ConnectorFormat.EndConnected Then _
+        Set shpB = arr.ConnectorFormat.EndConnectedShape
+    On Error GoTo 0
+
+    If Not shpA Is Nothing And Not shpB Is Nothing Then Exit Sub
+
+    ' Geometric fallback: bounding-box corners of a straight arrow
+    ' are its two endpoints. Test both diagonals.
+    Dim x1#, y1#, x2#, y2#
+    x1 = arr.Left: y1 = arr.Top
+    x2 = arr.Left + arr.Width: y2 = arr.Top + arr.Height
+
+    If shpA Is Nothing Then Set shpA = ShapeAtPoint(ws, arr, x1, y1)
+    If shpB Is Nothing Then Set shpB = ShapeAtPoint(ws, arr, x2, y2)
+
+    ' If both ended up on the same shape, try the other diagonal
+    If Not shpA Is Nothing And Not shpB Is Nothing Then
+        If shpA.Name = shpB.Name Then
+            Set shpA = ShapeAtPoint(ws, arr, x1, y2)
+            Set shpB = ShapeAtPoint(ws, arr, x2, y1)
+        End If
+    End If
+End Sub
+
+Private Function ShapeAtPoint(ws As Worksheet, exclude As Shape, _
+                              x As Double, y As Double) As Shape
+    Const PAD As Double = 4 ' points of tolerance
+    Dim s As Shape, best As Shape
+    Dim bestArea As Double: bestArea = 1E+18
+
+    For Each s In ws.Shapes
+        If s.Name <> exclude.Name Then
+            If s.Type = msoPicture _
+               Or s.Type = msoTextBox _
+               Or (s.Type = msoAutoShape) Then
+                If x >= s.Left - PAD And x <= s.Left + s.Width + PAD _
+                   And y >= s.Top - PAD And y <= s.Top + s.Height + PAD Then
+                    ' Prefer the smallest enclosing shape (e.g. red box over picture)
+                    Dim a#: a = s.Width * s.Height
+                    If a < bestArea Then
+                        bestArea = a
+                        Set best = s
+                    End If
+                End If
+            End If
+        End If
+    Next s
+    Set ShapeAtPoint = best
+End Function
+
+' --- shape classifiers ---
+
+Private Function IsRedRectangle(shp As Shape) As Boolean
+    On Error Resume Next
+    If shp.Type = msoAutoShape Then
+        If shp.AutoShapeType = msoShapeRectangle Then
+            If shp.Line.Visible = msoTrue Then
+                Dim c As Long
+                c = shp.Line.ForeColor.RGB
+                If c = RGB(255, 0, 0) Or _
+                   ((c Mod 256) < 80 And ((c \ 256) Mod 256) < 80 And (c \ 65536) > 170) Then
+                    IsRedRectangle = True
+                End If
+            End If
+        End If
+    End If
+    On Error GoTo 0
+End Function
+
+Private Function IsConnector(shp As Shape) As Boolean
+    On Error Resume Next
+    If shp.Connector = msoTrue Then IsConnector = True
+    On Error GoTo 0
+End Function
+
+' --- collection helpers (the previous bug lived here) ---
+
+Private Function ShapesOverlap(a As Shape, b As Shape) As Boolean
+    ShapesOverlap = Not (a.Left + a.Width < b.Left _
+                     Or b.Left + b.Width < a.Left _
+                     Or a.Top + a.Height < b.Top _
+                     Or b.Top + b.Height < a.Top)
+End Function
+
+Private Function IsInCollection(c As Collection, shp As Shape) As Boolean
+    Dim v As Variant
+    For Each v In c
+        If v.Name = shp.Name Then
+            IsInCollection = True
+            Exit Function
+        End If
+    Next v
+End Function
+
+Private Sub AddUnique(c As Collection, key As String)
+    On Error Resume Next
+    c.Add key, key   ' uniqueness enforced by collection key
+    On Error GoTo 0
+End Sub
+
+
+Sub DiagnoseShapes()
+    Dim s As Shape
+    For Each s In ActiveSheet.Shapes
+        Debug.Print "---"
+        Debug.Print "Name=" & s.Name & "  Type=" & s.Type
+        If s.Type = msoAutoShape Then
+            Debug.Print "  AutoShapeType=" & s.AutoShapeType _
+                      & "  LineRGB=" & s.Line.ForeColor.RGB
+        End If
+        If s.Type = msoLine Then
+            Debug.Print "  Connector=" & s.Connector
+            On Error Resume Next
+            Debug.Print "  BeginConnected=" & s.ConnectorFormat.BeginConnected
+            Debug.Print "  BeginShape=" & s.ConnectorFormat.BeginConnectedShape.Name
+            Debug.Print "  EndConnected=" & s.ConnectorFormat.EndConnected
+            Debug.Print "  EndShape=" & s.ConnectorFormat.EndConnectedShape.Name
+            On Error GoTo 0
+        End If
+    Next s
+End Sub
+
+Sub UngroupAnnotatedPictures()
+    Dim s As Shape, i As Long
+    For i = ActiveSheet.Shapes.count To 1 Step -1
+        Set s = ActiveSheet.Shapes(i)
+        If s.Type = msoGroup And Left$(s.Name, 13) = "AnnotatedPic_" Then
+            s.Ungroup
+        End If
+    Next i
+End Sub
